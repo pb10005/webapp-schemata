@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  node:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app
+    tty: true
+    volumes:
+      - .:/app
+  postgres:
+    image: postgres:latest
+    restart: always
+    container_name: postgres
+    hostname: postgres
+    environment:
+      POSTGRESd_USER: postgres
+      POSTGRES_PASSWORD: password
+      PGPASSWORD: password
+      TZ: "Asia/Tokyo"
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d
+
+volumes:
+  postgres:

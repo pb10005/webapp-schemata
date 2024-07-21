@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Menu {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String
+  price       Float
+  orders      Order[]
+  version     Int     @default(1)
+}
+
+model Order {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  menuId     Int
+  menu       Menu     @relation(fields: [menuId], references: [id])
+  customerId Int
+  customer   Customer @relation(fields: [customerId], references: [id])
+  quantity   Int
+  total      Float
+  sessionId  Int
+  session    Session  @relation(fields: [sessionId], references: [id])
+}
+
+model Customer {
+  id         Int       @id @default(autoincrement())
+  name       String
+  email      String    @unique
+  orders     Order[]
+  sessions   Session[]
+  address    String?
+  phone      String?
+  deviceId   String?
+  appVersion String?
+}
+
+model Session {
+  id          Int       @id @default(autoincrement())
+  isActive    Boolean   @default(true)
+  orders      Order[]
+  checkInTime DateTime  @default(now())
+  seats       Seat[]
+  Customer    Customer? @relation(fields: [customerId], references: [id])
+  customerId  Int?
+}
+
+model Seat {
+  id        Int     @id @default(autoincrement())
+  sessionId Int
+  session   Session @relation(fields: [sessionId], references: [id])
+  number    Int
+}
